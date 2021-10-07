@@ -2,29 +2,35 @@ package main
 
 import (
 	"fmt"
-	"math"
+	"sort"
 )
 
+type Point struct {
+	P int64
+	C int64
+}
+
 func main() {
-	var N, i, j, l int64
+	var N int64
 	fmt.Scanf("%d", &N)
 	A := make([]int64, N)
 	B := make([]int64, N)
-	for i = 0; i < N; i++ {
+	points := make([]Point, 2*N)
+	for i := 0; int64(i) < N; i++ {
 		fmt.Scanf("%d %d", &A[i], &B[i])
-		l = int64(math.Max(float64(l), float64(A[i]+B[i])))
+		points[2*i] = Point{P: A[i], C: 1}
+		points[2*i+1] = Point{P: A[i] + B[i], C: -1}
 	}
-	dp := make([]int64, l+1)
-	for i = 0; i < N; i++ {
-		for j = 0; j < B[i]; j++ {
-			dp[A[i]+j]++
-		}
+	sort.Slice(points, func(i, j int) bool {
+		return points[i].P < points[j].P
+	})
+	ans := make([]int64, N+1)
+	var cnt int64
+	for i := 0; i < len(points)-1; i++ {
+		cnt += points[i].C
+		ans[cnt] += points[i+1].P - points[i].P
 	}
-	ans := make([]int64, N)
-	for i = 1; i < l; i++ {
-		ans[dp[i]-1]++
-	}
-	for i = 0; i < N; i++ {
+	for i := 1; int64(i) <= N; i++ {
 		fmt.Printf("%d ", ans[i])
 	}
 	fmt.Println()
